@@ -7,7 +7,7 @@ import argparse
 #   Test timestamps
 # input_timestamp = 590517794000000000      #   coredata nano   2019-09-18 12:43:14
 # input_timestamp = 590517794                 #   coredata   2019-09-18 12:43:14
-# input_timestamp = 1662521895
+# input_timestamp = 1662521895                # unix
 # input_timestamp = 1662521895000000000        #   APFS timestamp
 # input_timestamp = 6318253A                 #  in hex
 
