@@ -4,12 +4,15 @@ import time
 import datetime
 import argparse
 
+######  ToDo work on the float conversion for webkit and cocoa
+
 #   Test timestamps
 # input_timestamp = 590517794000000000      #   coredata nano   2019-09-18 12:43:14
-# input_timestamp = 590517794                 #   coredata   2019-09-18 12:43:14
-# input_timestamp = 1662521895                # unix
-# input_timestamp = 1662521895000000000        #   APFS timestamp
-# input_timestamp = 6318253A                 #  in hex
+# input_timestamp = 590517794               #   coredata   2019-09-18 12:43:14
+# input_timestamp = 1662521895              #   unix
+# input_timestamp = 1662521895000000000     #   APFS timestamp
+# input_timestamp = 6318253A                #   in hex
+# input-timestamp = 1.0c91b21p+29           0x1.0c91b21p+29
 
 
 ###############     Argument Parser     #################
@@ -39,8 +42,6 @@ args = parser.parse_args()
 
 input_timestamp = args.timestamp
 # input_timestamp = int(input_timestamp)
-length = len(str(input_timestamp))
-
 
 def convertHex(timestamp):
     hex_characters = ['a', 'b', 'c', 'd', 'e', 'f']
@@ -64,9 +65,20 @@ def convertHex(timestamp):
                 return(new_input_timestamp)
             except:
                 print("This is not an accepted format. Please use a decimal or hex value.")
-
     else:
         pass
+
+def fromFloat(timestamp):
+    if "." in timestamp:
+        global new_decimal
+        new_decimal = float.fromhex(timestamp)
+        new_decimal = round(new_decimal)
+        print(new_decimal)
+    return(new_decimal)
+fromFloat(input_timestamp)
+input_timestamp = new_decimal
+
+length = len(str(input_timestamp))
 
 def fromUnix(timestamp):
     try:
@@ -102,6 +114,17 @@ def fromCocoaNano(timestamp):
         convCocoa = datetime.datetime.strptime(time.ctime(cocoa),"%a %b %d %H:%M:%S %Y")
         convCocoa.strftime('%m-%d-%Y %H:%M:%S')
         convCocoa = str(convCocoa)
+        print("Mac Cocoa/Core Time (Nano): \t" + convCocoa)
+    else:
+        pass
+
+def fromGoogleWebkit(timestamp):
+    if length > 11:
+        webKit = int(timestamp) - 11644473600000
+        webKit = webKit / 1000000000
+        convwebKit = datetime.datetime.strptime(time.ctime(webKit),"%a %b %d %H:%M:%S %Y")
+        convwebKit.strftime('%m-%d-%Y %H:%M:%S')
+        convwebKit = str(convwebKit)
         print("Mac Cocoa/Core Time (Nano): \t" + convCocoa)
     else:
         pass
