@@ -1,18 +1,17 @@
 #   A script to convert timestamps on Mac
 
+from hmac import new
 import time
 import datetime
 import argparse
 
-######  ToDo work on the float conversion for webkit and cocoa
-
 #   Test timestamps
 # input_timestamp = 590517794000000000      #   coredata nano   2019-09-18 12:43:14
 # input_timestamp = 590517794               #   coredata   2019-09-18 12:43:14
-# input_timestamp = 1662521895              #   unix
-# input_timestamp = 1662521895000000000     #   APFS timestamp
-# input_timestamp = 6318253A                #   in hex
-# input-timestamp = 1.0c91b21p+29           0x1.0c91b21p+29
+# input_timestamp = 1662521895              #   unix    2022-09-07 03:38:15 UTC
+# input_timestamp = 1662521895000000000     #   APFS timestamp    2022-09-07 03:38:15 UTC
+# input_timestamp = 6318253A                #   unix in hex   2022-09-07 04:59:38 UTC
+# input-timestamp = 1.0c91b21p+29           #   0x1.0c91b21p+29     2018-11-06 20:51:14 UTC
 
 
 ###############     Argument Parser     #################
@@ -34,7 +33,7 @@ parser.add_argument("timestamp", type=(str) ,help="Timestamp to convert")
 
 # Optional Arguments
 
-parser.add_argument("-x", "--hex", action="store_true",help="convert from hex value" )
+parser.add_argument("-x", "--Hex", action="store_true",help="convert from hex value" )
 
 #Parsing and using the arguments
 
@@ -69,14 +68,24 @@ def convertHex(timestamp):
         pass
 
 def fromFloat(timestamp):
-    if "." in timestamp:
-        global new_decimal
-        new_decimal = float.fromhex(timestamp)
-        new_decimal = round(new_decimal)
-        print(new_decimal)
-    return(new_decimal)
+    try:
+        if "." in timestamp:
+            global new_decimal
+            new_decimal = float.fromhex(timestamp)
+            new_decimal = round(new_decimal)
+            
+            return(new_decimal)
+    except NameError:
+        print("NameError - is variable assigned correctly?")
 fromFloat(input_timestamp)
-input_timestamp = new_decimal
+
+try:
+    if len(str(new_decimal)) > 0:
+        input_timestamp = new_decimal
+    else:
+        pass
+except NameError:
+    pass   
 
 length = len(str(input_timestamp))
 
@@ -129,13 +138,13 @@ def fromGoogleWebkit(timestamp):
     else:
         pass
 
-def APFS(timestamp):        #   not working
+def APFS(timestamp):        #   provide both endianess
     timestamp = int(timestamp)
-    t = (datetime.datetime(1970,1,1) + datetime.timedelta(microseconds=timestamp / 1000. ))
+    t = (datetime.datetime(1970,1,1) + datetime.timedelta(microseconds=timestamp / 1000. ))     #   Thanks, Yogesh!
     new_t = t.strftime('%Y-%m-%d %H:%M:%S')
     print("Mac APFS Time: \t\t\t" +str(new_t))
 
-if args.hex:                        # is the hex flag set in command? then this converts to integer
+if args.Hex:                        # is the hex flag set in command? then this converts to integer
     convertHex(input_timestamp)
     input_timestamp = new_input_timestamp
 print(" ")
@@ -144,5 +153,3 @@ fromCocoa(input_timestamp)
 fromCocoaNano(input_timestamp)
 APFS(input_timestamp)
 print(" ")
-
-
