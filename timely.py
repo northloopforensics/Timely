@@ -167,7 +167,7 @@ def fromGoogleWebkit(timestamp):
     except OSError:
         pass
 
-def APFS(timestamp):        #   provide both endianess
+def fromAPFS(timestamp):        #   provide both endianess
     timestamp = int(timestamp)
     t = (datetime.datetime(1970,1,1) + datetime.timedelta(microseconds=timestamp / 1000. ))     #   Thanks, Yogesh!
     new_t = t.strftime('%Y-%m-%d %H:%M:%S')
@@ -183,7 +183,9 @@ print(" ")
 fromUnix(input_timestamp)
 fromCocoa(input_timestamp)
 fromCocoaNano(input_timestamp)
-APFS(input_timestamp)
+fromAPFS(input_timestamp)
 fromGoogleWebkit(input_timestamp)
 fromFileTime(input_timestamp)
 print(" ")
+
+
