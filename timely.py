@@ -1,6 +1,7 @@
 #   A script to convert timestamps on Mac
+#   Supports the following epochs:
+#       Cocoa (aka Mac Absolute) nano - Unix seconds - Google Webkit micro - Windows Filetime micro - APFS
 
-from hmac import new
 import time
 import datetime
 import argparse
@@ -11,7 +12,7 @@ import argparse
 # input_timestamp = 1662521895              #   unix    2022-09-07 03:38:15 UTC
 # input_timestamp = 1662521895000000000     #   APFS timestamp    2022-09-07 03:38:15 UTC
 # input_timestamp = 6318253A                #   unix in hex   2022-09-07 04:59:38 UTC
-# input-timestamp = 1.0c91b21p+29           #   0x1.0c91b21p+29     2018-11-06 20:51:14 UTC
+# input-timestamp = 1.0c91b21p+29           #   Float 0x1.0c91b21p+29     2018-11-06 20:51:14 UTC
 
 
 ###############     Argument Parser     #################
@@ -122,27 +123,54 @@ def fromCocoaNano(timestamp):
         cocoa = cocoa / 1000000000
         convCocoa = datetime.datetime.strptime(time.ctime(cocoa),"%a %b %d %H:%M:%S %Y")
         convCocoa.strftime('%m-%d-%Y %H:%M:%S')
-        convCocoa = str(convCocoa)
-        print("Mac Cocoa/Core Time (Nano): \t" + convCocoa)
+        print("Mac Cocoa/Core Time (Nano): \t" + str(convCocoa) + " Local Time")
+        cocoaUTC = (datetime.datetime.utcfromtimestamp(cocoa))
+        organized_cocoaUTC = cocoaUTC.strftime('%Y-%m-%d %H:%M:%S')
+        print("Mac Cocoa/Core Time (Nano): \t" + str(organized_cocoaUTC) + " UTC")
     else:
         pass
 
+def fromFileTime(timestamp):
+    try: 
+        if length > 11:
+            filetime = int(timestamp) - 116444736000000000
+            filetime = filetime / 10000000
+            filetime = round(filetime)
+            convfiletime = datetime.datetime.strptime(time.ctime(filetime),"%a %b %d %H:%M:%S %Y")
+            convfiletime.strftime('%m-%d-%Y %H:%M:%S')
+            convfiletime = str(convfiletime)
+            print("Filetime (Micro): \t\t" + convfiletime + " Local Time")
+            filetimeUTC = str(datetime.datetime.utcfromtimestamp(filetime))
+            print("Filetime (Micro): \t\t" + filetimeUTC + " UTC")
+        else:
+            pass
+    except OSError:
+        pass
+
 def fromGoogleWebkit(timestamp):
-    if length > 11:
-        webKit = int(timestamp) - 11644473600000
-        webKit = webKit / 1000000000
-        convwebKit = datetime.datetime.strptime(time.ctime(webKit),"%a %b %d %H:%M:%S %Y")
-        convwebKit.strftime('%m-%d-%Y %H:%M:%S')
-        convwebKit = str(convwebKit)
-        print("Mac Cocoa/Core Time (Nano): \t" + convCocoa)
-    else:
+    try:
+        if length > 11:
+            webKit = int(timestamp) / 1000
+            webKit = webKit - 11644473600000 
+            webKit = webKit / 1000
+            webKit = round(webKit)
+            convwebKit = datetime.datetime.strptime(time.ctime(webKit),"%a %b %d %H:%M:%S %Y")
+            convwebKit.strftime('%m-%d-%Y %H:%M:%S')
+            convwebKit = str(convwebKit)
+            print("Webkit / Filetime (Micro): \t" + convwebKit + " Local Time")
+            webkitUTC = str(datetime.datetime.utcfromtimestamp(webKit))
+            print("Webkit / Filetime (Micro): \t" + webkitUTC + " UTC")
+        else:
+            pass
+    except OSError:
         pass
 
 def APFS(timestamp):        #   provide both endianess
     timestamp = int(timestamp)
     t = (datetime.datetime(1970,1,1) + datetime.timedelta(microseconds=timestamp / 1000. ))     #   Thanks, Yogesh!
     new_t = t.strftime('%Y-%m-%d %H:%M:%S')
-    print("Mac APFS Time: \t\t\t" +str(new_t))
+    print("Mac APFS Time: \t\t\t" +str(new_t) + " Local Time")
+    
 
 if args.Hex:                        # is the hex flag set in command? then this converts to integer
     convertHex(input_timestamp)
@@ -152,4 +180,6 @@ fromUnix(input_timestamp)
 fromCocoa(input_timestamp)
 fromCocoaNano(input_timestamp)
 APFS(input_timestamp)
+fromGoogleWebkit(input_timestamp)
+fromFileTime(input_timestamp)
 print(" ")
