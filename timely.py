@@ -43,6 +43,8 @@ args = parser.parse_args()
 input_timestamp = args.timestamp
 # input_timestamp = int(input_timestamp)
 
+#############  Parsing Functions #################
+
 def convertHex(timestamp):
     hex_characters = ['a', 'b', 'c', 'd', 'e', 'f']
 
@@ -171,6 +173,8 @@ def APFS(timestamp):        #   provide both endianess
     new_t = t.strftime('%Y-%m-%d %H:%M:%S')
     print("Mac APFS Time: \t\t\t" +str(new_t) + " Local Time")
     
+
+############## Let's run things #################
 
 if args.Hex:                        # is the hex flag set in command? then this converts to integer
     convertHex(input_timestamp)
