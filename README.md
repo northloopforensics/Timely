@@ -22,5 +22,6 @@ Windows Filetime
 
 APFS
 
+![alt text](https://user-images.githubusercontent.com/73806121/191170077-5fb35bb6-671c-4280-9d06-d69c54b4d17c.png)
 
 It will also accept Hex based timestamps and the float format sometimes seen in Mac artifacts (ex. 0x1.0c91b21p+29)
